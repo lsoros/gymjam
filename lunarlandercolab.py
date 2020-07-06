@@ -8,6 +8,7 @@ Original file is located at
 """
 
 import sys
+import numpy as np
 from random import randint
 import gym
 from time import time
@@ -33,8 +34,10 @@ ME_POLYHASH_BC = 'ME-polyhashBC'
 ME_FITNESS_BC = 'ME-fitnessBC'
 ME_ENTROPY_BC = 'ME-entropyBC'
 MODES = [ME_ENDPOINT_BC, ME_POLYHASH_BC, ME_FITNESS_BC, ME_ENTROPY_BC]
-
+lander_steps_differences_list=np.zeros(100001)
+max_lander_contacts_difference=-80
 DEFAULT_SEED = 1009
+current_run=0
 
 # A generic game evaluator.
 # Make specific evaluators if feature info is
@@ -62,6 +65,15 @@ class GameEvaluator:
 
         action_count = 0
         done = False
+        positive_rewards=0
+        steps_between_landers_contacting_the_ground=0
+        lander_contacts_difference=-80
+        both_legs_touching_ground=False
+        global max_lander_contacts_difference
+        global lander_steps_differences_list
+        global current_run
+
+
         while not done:
             # if render:
             #    env.render()
@@ -71,11 +83,38 @@ class GameEvaluator:
             action_count += 1
 
             observation, reward, done, info = env.step(action)
+            # if(reward>0):
+            #     positive_rewards+=1
+            # print(observation)
+
+            
+            if(observation[6]==1.0 and observation[7]==1.0 and both_legs_touching_ground==False ):
+                both_legs_touching_ground=True
+
+                lander_contacts_difference=steps_between_landers_contacting_the_ground
+                # print('time taken to contact the ground',steps_between_landers_contacting_the_ground)
+            if(observation[6]==1.0 or observation[7]==1.0):
+                # print('initial contact with the ground made')
+                steps_between_landers_contacting_the_ground+=1
+
             agent.fitness += reward
 
             action_frequency[action] += 1
 
         final_observation = list(observation)
+        # print('positive_rewards are',positive_rewards)
+        if(lander_contacts_difference>max_lander_contacts_difference):
+            max_lander_contacts_difference=lander_contacts_difference
+            print('new max difference is',max_lander_contacts_difference)
+
+        # if(lander_contacts_difference!=-80):
+        #     print('time to touch the ground',lander_contacts_difference)
+        lander_steps_differences_list[current_run]=lander_contacts_difference
+        current_run+=1
+        if(current_run%100==0):
+            np.savetxt("foo.csv",lander_steps_differences_list,delimiter=",")
+        if(agent.fitness>=200):
+            print('agent fitness is ',agent.fitness)
 
         # For experiment 2D MAP-Elites polyhashBC
         if self.mode == ME_POLYHASH_BC:
@@ -104,7 +143,10 @@ class GameEvaluator:
             agent.features = (numNewChars, numNewChars)
         # For experiment endpointBC and others
         else:
-            agent.features = tuple(final_observation[:1])
+            # agent.features = tuple(final_observation[:1])
+            if(lander_contacts_difference==-80):
+                lander_contacts_difference=101
+            agent.features=(lander_contacts_difference,lander_contacts_difference)
 
         agent.action_count = action_count
 
@@ -385,13 +427,13 @@ def runME(run_id, game, sequence_len,
     best_fitness = -10 ** 18
     best_sequence = None
     whenfound = 0
-
+    global lander_steps_differences_list
     sizer = None
     if sizer_type == 'Linear':
         sizer = LinearSizer(*sizer_range)
     elif sizer_type == 'Exponential':
         sizer = ExponentialSizer(*sizer_range)
-
+    print('mode is',mode)
     # Experiment branches...
     if mode == ME_POLYHASH_BC:
         feature_ranges = [(0.0, sequence_len), (0.0, sequence_len)]
@@ -403,7 +445,8 @@ def runME(run_id, game, sequence_len,
         feature_ranges = [(0.0, sequence_len), (0.0, sequence_len)]
     # For experiment endpointBC and others
     else:
-        feature_ranges = [(-1.0, 1.0), (0.0, 1.0)]
+        # feature_ranges = [(-1.0, 1.0), (0.0, 1.0)]
+        feature_ranges = [(0.0, 101.0), (0.0, 101.0)]
 
     # Yes, this array slice is invariant across all branches above.
     feature_ranges = feature_ranges[:2]
@@ -419,6 +462,7 @@ def runME(run_id, game, sequence_len,
 
     session_checkpoint_time = int(time.time())
     num_checkpoints = 0
+    # num_individuals=1
 
     for individuals_evaluated in range(num_individuals):
 
@@ -450,7 +494,7 @@ def runME(run_id, game, sequence_len,
             # for f in features:
             #    print(sorted(f))
             # print(indicies)
-
+            print('evaluated ',individuals_evaluated)
             print(individuals_evaluated, best_fitness,
                   len(feature_map.elite_indices))
 
@@ -519,7 +563,7 @@ def main(args=None):
               sizer_range=sizer_range,
               buffer_size=None,
               checkpoint=checkpoint,
-              mode=mode
+              mode=ME_ENDPOINT_BC
               )
     elif search_type == 'test':
         from gymjam.search import Agent
