@@ -21,7 +21,7 @@ import argparse
 from checkpointing import Checkpoint
 
 # edit this to customize the output directory, remember to add trailing slash.
-RESULTS_OUTPUT_DIR = ""
+RESULTS_OUTPUT_DIR = "/Users/bharathsurianarayanan/Desktop/gymjam/lander_steps_stats/"
 # use this to control whether checkpointing is activated or not
 CHECKPOINT_ENABLED = False
 CHECKPOINT_PREFIX = "untitled"
@@ -34,10 +34,12 @@ ME_POLYHASH_BC = 'ME-polyhashBC'
 ME_FITNESS_BC = 'ME-fitnessBC'
 ME_ENTROPY_BC = 'ME-entropyBC'
 MODES = [ME_ENDPOINT_BC, ME_POLYHASH_BC, ME_FITNESS_BC, ME_ENTROPY_BC]
-lander_steps_differences_list=np.zeros(100001)
+lander_steps_differences_list=np.zeros(100021)
+lander_steps_differences_list.fill(-80)
 max_lander_contacts_difference=-80
 DEFAULT_SEED = 1009
 current_run=0
+current_run_id=-1
 
 # A generic game evaluator.
 # Make specific evaluators if feature info is
@@ -72,6 +74,8 @@ class GameEvaluator:
         global max_lander_contacts_difference
         global lander_steps_differences_list
         global current_run
+        global current_run_id
+
 
 
         while not done:
@@ -109,10 +113,15 @@ class GameEvaluator:
 
         # if(lander_contacts_difference!=-80):
         #     print('time to touch the ground',lander_contacts_difference)
+        
         lander_steps_differences_list[current_run]=lander_contacts_difference
+        
+
         current_run+=1
-        if(current_run%100==0):
-            np.savetxt("foo.csv",lander_steps_differences_list,delimiter=",")
+    
+        # save to the csv file after every 1000 individuals are evaluated
+        if(current_run%1000==0):
+            np.savetxt("lander_steps_differences_list"+current_run_id+".csv",lander_steps_differences_list,delimiter=",")
         if(agent.fitness>=200):
             print('agent fitness is ',agent.fitness)
 
@@ -428,6 +437,8 @@ def runME(run_id, game, sequence_len,
     best_sequence = None
     whenfound = 0
     global lander_steps_differences_list
+    global current_run_id
+    current_run_id=run_id
     sizer = None
     if sizer_type == 'Linear':
         sizer = LinearSizer(*sizer_range)
@@ -465,7 +476,6 @@ def runME(run_id, game, sequence_len,
     # num_individuals=1
 
     for individuals_evaluated in range(num_individuals):
-
         cur_agent = None
         if individuals_evaluated < init_pop_size:
             cur_agent = Agent(game, sequence_len)
@@ -484,6 +494,9 @@ def runME(run_id, game, sequence_len,
             print('improved:', cur_agent.fitness, cur_agent.action_count)
             best_fitness = cur_agent.fitness
             best_sequence = cur_agent.commands
+            # print(type(best_sequence))
+            print('best sequence is ',best_sequence)
+
             whenfound = individuals_evaluated
             game.run(cur_agent, render=False)
 
@@ -497,6 +510,10 @@ def runME(run_id, game, sequence_len,
             print('evaluated ',individuals_evaluated)
             print(individuals_evaluated, best_fitness,
                   len(feature_map.elite_indices))
+    # Storing the bestsequence to simulate the lander moves later
+    with open('best_fitness_{}.txt'.format(run_id), 'w') as filehandle:
+        for listitem in best_sequence:
+            filehandle.write('%s\n' % listitem)
 
     with open('{}results_{}.txt'.format(RESULTS_OUTPUT_DIR, run_id), 'a') as f:
         f.write(str(whenfound) + " " + str(best_fitness) + "\n")
@@ -521,7 +538,8 @@ def main(args=None):
     checkpoint_resume = args.checkpoint_resume if args.checkpoint_resume else CHECKPOINT_RESUME
     checkpoint_frequency = args.checkpoint_frequency if args.checkpoint_frequency else 1000
     seed = args.seed if args.seed else DEFAULT_SEED
-    sizer_range = tuple(args.sizer_range) if args.sizer_range else (2, 200)
+    sizer_range = tuple(args.sizer_range) if args.sizer_range else (200, 200)
+    # print('sizer range is ',sizer_range)
     is_plus = args.is_plus # NOTE: this defaults to false
     mode = args.mode
     #game = GameEvaluator('Qbert-v0', seed=1009, num_rep=2)
@@ -565,6 +583,7 @@ def main(args=None):
               checkpoint=checkpoint,
               mode=ME_ENDPOINT_BC
               )
+
     elif search_type == 'test':
         from gymjam.search import Agent
         cur_agent = Agent(game, num_actions)
@@ -595,6 +614,7 @@ parser.add_argument('--run-id', default='', type=str)
 parser.add_argument('--seed', metavar='S', type=int, default=DEFAULT_SEED)
 parser.add_argument('--mode', metavar='M', type=str)
 parser.add_argument('--sizer-range', metavar='SR', type=int, nargs=2)
+
 
 if __name__ == '__main__':
     args = parser.parse_args()
