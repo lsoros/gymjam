@@ -1,0 +1,2 @@
+file_name,best_fitness,best_fitnesss_mean,best_fitness_std,best_fitness_times_mean,best_fitness_times_std,summed_fitness_mean,summed_fitness_std,cells_filled_mean,cells_filled_std
+lander_steps_exp1_stats,64.23869994634583,48.94365959232236,8.151592549994774,,,0.001808388580651954,4.207725983820772,27.0,2.073644135332772
