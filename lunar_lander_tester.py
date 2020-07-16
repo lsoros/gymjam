@@ -34,6 +34,7 @@ ME_ENDPOINT_BC = 'ME-endpointBC'
 ME_POLYHASH_BC = 'ME-polyhashBC'
 ME_FITNESS_BC = 'ME-fitnessBC'
 ME_ENTROPY_BC = 'ME-entropyBC'
+ME_LANDER_STEPS_BD='ME_stepsdiffBC'
 MODES = [ME_ENDPOINT_BC, ME_POLYHASH_BC, ME_FITNESS_BC, ME_ENTROPY_BC]
 lander_steps_differences_list=np.zeros(100021)
 lander_steps_differences_list.fill(-80)
@@ -80,7 +81,8 @@ class GameEvaluator:
 
         if render:
             # env.render()
-            rec=VideoRecorder(env)
+            rec=VideoRecorder(env,path='/Users/bharathsurianarayanan/Desktop/gymjam/videoResults/temp1.mp4')
+            # rec.path='/Users/bharathsurianarayanan/Desktop/gymjam/videoResults/'
 
 
         while not done:
@@ -118,6 +120,7 @@ class GameEvaluator:
 
         final_observation = list(observation)
         if(render):
+            print('recodring path is ',rec.path)
             rec.close()
         # print('positive_rewards are',positive_rewards)
         if(lander_contacts_difference>max_lander_contacts_difference):
