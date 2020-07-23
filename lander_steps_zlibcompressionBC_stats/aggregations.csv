@@ -1,0 +1,2 @@
+file_name,best_fitness,best_fitnesss_mean,best_fitness_std,best_fitness_times_mean,best_fitness_times_std,summed_fitness_mean,summed_fitness_std,cells_filled_mean,cells_filled_std
+lander_steps_ZlibCompressionBC_stats,321.4455347972721,64.95391213680514,60.03852974279625,,,-1.8741422070474703,5.216641667050945,26.85,2.17428149051589
