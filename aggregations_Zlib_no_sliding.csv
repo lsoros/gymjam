@@ -1,0 +1,2 @@
+file_name,best_fitness,best_fitnesss_mean,best_fitness_std,best_fitness_times_mean,best_fitness_times_std,summed_fitness_mean,summed_fitness_std,cells_filled_mean,cells_filled_std
+ME_ZlibCompressionBC_no_sliding_stats,81.07456689363542,49.38447618813119,12.261526425702897,,,-14.875930901692948,9.739114707823864,17.55,0.8046738469715541
