@@ -23,7 +23,7 @@ from gym.wrappers.monitoring.video_recorder import VideoRecorder
 import zlib
 
 # edit this to customize the output directory, remember to add trailing slash.
-RESULTS_OUTPUT_DIR = "/Users/bharathsurianarayanan/Desktop/gymjam/lander_steps_stats/"
+RESULTS_OUTPUT_DIR = "/Users/bharathsurianarayanan/Desktop/gymjam/compressionBC_stats/"
 # use this to control whether checkpointing is activated or not
 CHECKPOINT_ENABLED = False
 CHECKPOINT_PREFIX = "untitled"
@@ -80,7 +80,7 @@ class GameEvaluator:
 
         if render:
             # env.render()
-            rec=VideoRecorder(env,path='/Users/bharathsurianarayanan/Desktop/gymjam/videoResults/'+ current_run_id+'.mp4')
+            rec=VideoRecorder(env,path='/Users/bharathsurianarayanan/Desktop/gymjam/video_results_compressionBC/'+ current_run_id+'.mp4')
 
 
         while not done:
@@ -129,10 +129,10 @@ class GameEvaluator:
         current_run+=1
     
         # save to the csv file after every 1000 individuals are evaluated
-        if(current_run%1000==0):
-            np.savetxt("lander_steps_differences_list"+current_run_id+".csv",lander_steps_differences_list,delimiter=",")
-        if(agent.fitness>=200):
-            print('agent fitness is ',agent.fitness)
+        # if(current_run%1000==0):
+        #     np.savetxt("lander_steps_differences_list"+current_run_id+".csv",lander_steps_differences_list,delimiter=",")
+        # if(agent.fitness>=200):
+        #     print('agent fitness is ',agent.fitness)
 
         # For experiment 2D MAP-Elites polyhashBC
 
@@ -162,18 +162,13 @@ class GameEvaluator:
             agent.features = (numNewChars, numNewChars)
         # For experiment endpointBC and others
         else:
-            # agent.features = tuple(final_observation[:1])
-            # if(lander_contacts_difference==-80):
-            #     lander_contacts_difference=101
-            # print('length of commandes is',len(agent.commands))
+            
             original_string='.'.join(str(e) for e in agent.commands)
             # print('original length is ',len(original_string))
             compressed_string=zlib.compress(original_string.encode("utf-8"))
             compressed_length=len(compressed_string)
-            # print('length of compressed_string is ',len(compressed_string))
-            # print('compressed_string is ',compressed_string)
-
-            agent.features=(lander_contacts_difference,lander_contacts_difference)
+          
+            agent.features=(compressed_length,compressed_length)
 
         agent.action_count = action_count
 
@@ -564,7 +559,7 @@ def main(args=None):
     checkpoint_frequency = args.checkpoint_frequency if args.checkpoint_frequency else 1000
     seed = args.seed if args.seed else DEFAULT_SEED
     sizer_range = tuple(args.sizer_range) if args.sizer_range else (200, 200)
-    # print('sizer range is ',sizer_range)
+    print('sizer range is ',sizer_range)
     is_plus = args.is_plus # NOTE: this defaults to false
     mode = args.mode
     #game = GameEvaluator('Qbert-v0', seed=1009, num_rep=2)
