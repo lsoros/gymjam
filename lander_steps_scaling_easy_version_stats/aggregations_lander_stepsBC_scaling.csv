@@ -1,0 +1,2 @@
+file_name,best_fitness,best_fitnesss_mean,best_fitness_std,best_fitness_times_mean,best_fitness_times_std,summed_fitness_mean,summed_fitness_std,cells_filled_mean,cells_filled_std
+lander_stepsBC_scaling_stats,255.91960887733217,235.53673416200036,9.012955677783326,,,23.402096288166458,18.126365891042372,43.3,2.4515301344262523
