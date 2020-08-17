@@ -23,7 +23,11 @@ from checkpointing import Checkpoint
 from gym.wrappers.monitoring.video_recorder import VideoRecorder
 
 # edit this to customize the output directory, remember to add trailing slash.
+<<<<<<< HEAD:lunar_lander_compressionBC.py
+RESULTS_OUTPUT_DIR = "/Users/bharathsurianarayanan/Desktop/gymjam/compressionBC_stats/"
+=======
 RESULTS_OUTPUT_DIR = "/home/logan/gym/gymjam/lander_steps_stats/"
+>>>>>>> 027d372474f8679def87f09bdadf88ed12c9c7aa:angleVelocity_and_leg_experiments_no_scaling/lander_angle_and_velocity.py
 # use this to control whether checkpointing is activated or not
 CHECKPOINT_ENABLED = False
 CHECKPOINT_PREFIX = "untitled"
@@ -105,9 +109,14 @@ class GameEvaluator:
 
         if render:
             # env.render()
+<<<<<<< HEAD:lunar_lander_compressionBC.py
+            rec=VideoRecorder(env,path='/Users/bharathsurianarayanan/Desktop/gymjam/video_results_compressionBC/'+ current_run_id+'.mp4')
+
+=======
             rec=VideoRecorder(env,path='/home/logan/gym/gymjam/videoResults_angle_and_velocity/temp'+str(current_run_id)+'_'+str(current_video_id)+'.mp4')
             # rec.path='/Users/bharathsurianarayanan/Desktop/gymjam/videoResults/'
             current_video_id+=1
+>>>>>>> 027d372474f8679def87f09bdadf88ed12c9c7aa:angleVelocity_and_leg_experiments_no_scaling/lander_angle_and_velocity.py
 
         while not done:
             # if render:
@@ -183,12 +192,19 @@ class GameEvaluator:
         current_run+=1
     
         # save to the csv file after every 1000 individuals are evaluated
+<<<<<<< HEAD:lunar_lander_compressionBC.py
+        # if(current_run%1000==0):
+        #     np.savetxt("lander_steps_differences_list"+current_run_id+".csv",lander_steps_differences_list,delimiter=",")
+        # if(agent.fitness>=200):
+        #     print('agent fitness is ',agent.fitness)
+=======
         if(current_run%1000==0):
             # np.savetxt("lander_steps_differences_list"+current_run_id+".csv",lander_steps_differences_list,delimiter=",")
             np.savetxt("lander_contact_angle_list"+str(current_run_id)+".csv",lander_finish_angle_list,delimiter=",")
             np.savetxt("lander_contact_velocity_list"+str(current_run_id)+".csv",lander_finish_velocity_list,delimiter=",")
         if(agent.fitness>=200):
             print('agent fitness is ',agent.fitness)
+>>>>>>> 027d372474f8679def87f09bdadf88ed12c9c7aa:angleVelocity_and_leg_experiments_no_scaling/lander_angle_and_velocity.py
 
         # For experiment 2D MAP-Elites polyhashBC
         if self.mode == ME_POLYHASH_BC:
@@ -217,12 +233,22 @@ class GameEvaluator:
             agent.features = (numNewChars, numNewChars)
         # For experiment endpointBC and others
         else:
+<<<<<<< HEAD:lunar_lander_compressionBC.py
+            
+            original_string='.'.join(str(e) for e in agent.commands)
+            # print('original length is ',len(original_string))
+            compressed_string=zlib.compress(original_string.encode("utf-8"))
+            compressed_length=len(compressed_string)
+          
+            agent.features=(compressed_length,compressed_length)
+=======
             # agent.features = tuple(final_observation[:1])
             if(lander_contact_angle==-1000):
                 lander_contact_angle=25.1
             if(lander_contact_resultant_velocity==-1000):
                 lander_contact_resultant_velocity=5
             agent.features=(lander_contact_resultant_velocity,lander_contact_angle)
+>>>>>>> 027d372474f8679def87f09bdadf88ed12c9c7aa:angleVelocity_and_leg_experiments_no_scaling/lander_angle_and_velocity.py
 
         agent.action_count = action_count
 
@@ -633,7 +659,7 @@ def main(args=None):
     checkpoint_frequency = args.checkpoint_frequency if args.checkpoint_frequency else 1000
     seed = args.seed if args.seed else DEFAULT_SEED
     sizer_range = tuple(args.sizer_range) if args.sizer_range else (200, 200)
-    # print('sizer range is ',sizer_range)
+    print('sizer range is ',sizer_range)
     is_plus = args.is_plus # NOTE: this defaults to false
     mode = args.mode
     #game = GameEvaluator('Qbert-v0', seed=1009, num_rep=2)

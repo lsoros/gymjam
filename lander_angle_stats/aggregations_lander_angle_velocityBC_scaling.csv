@@ -1,0 +1,2 @@
+file_name,best_fitness,best_fitnesss_mean,best_fitness_std,best_fitness_times_mean,best_fitness_times_std,summed_fitness_mean,summed_fitness_std,cells_filled_mean,cells_filled_std
+lander_angle_velocityBC_scaling_stats,74.5480253797081,53.38521924845635,10.965630590179094,,,-177.8602794214279,6.4243974498541085,114.1,3.3896902513356584
